@@ -251,14 +251,12 @@ ionic.tap = {
   },
 
   isElementTapDisabled: function(ele) {
-    if (ele && ele.nodeType === 1) {
-      var element = ele;
-      while (element) {
-        if ((element.dataset ? element.dataset.tapDisabled : element.getAttribute('data-tap-disabled')) == 'true') {
-          return true;
-        }
-        element = element.parentElement;
+    var element = ele;
+    while (element && element.nodeType === 1) {
+      if ((element.dataset ? element.dataset.tapDisabled : element.getAttribute && element.getAttribute('data-tap-disabled')) == 'true') {
+        return true;
       }
+      element = element.parentElement || element.parentNode;
     }
     return false;
   },
@@ -467,7 +465,7 @@ function tapEnableTouchEvents() {
 }
 
 function tapIgnoreEvent(e) {
-  if (e.isTapHandled) return true;
+  if (e.isTapHandled || ionic.tap.isElementTapDisabled(e.target)) return true;
   e.isTapHandled = true;
 
   if (ionic.scroll.isScrolling && ionic.tap.containsOrIsTextInput(e.target)) {
@@ -494,7 +492,6 @@ function tapHandleFocus(ele) {
   } else if ((/^(input|textarea)$/i).test(ele.tagName) || ele.isContentEditable) {
     triggerFocusIn = true;
     ele.focus && ele.focus();
-    ele.value = ele.value;
     if (tapEnabledTouchEvents) {
       tapTouchFocusedInput = ele;
     }
